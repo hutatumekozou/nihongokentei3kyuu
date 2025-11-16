@@ -4,16 +4,10 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // グラデーション背景
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(red: 0.6, green: 0.8, blue: 1.0),
-                        Color(red: 0.4, green: 0.6, blue: 0.9)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                Image("LaunchBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 20) {
                     // タイトルセクション
