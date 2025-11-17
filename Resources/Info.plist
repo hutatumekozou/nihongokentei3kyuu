@@ -5,9 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ja_JP</string>
 	<key>CFBundleDisplayName</key>
-	<string>福祉住環境コーディネーター2級</string>
+	<string>日本語検定3級</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -21,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-8365176591962448~7670491829</string>
+	<string>ca-app-pub-8365176591962448~9872481585</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchScreen</key>

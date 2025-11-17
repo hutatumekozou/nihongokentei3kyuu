@@ -91,6 +91,7 @@ struct ResultView: View {
                         .fontWeight(.medium)
                         .foregroundColor(.black)
                         .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true) // メッセージを複数行で全文表示できるように修正
                     
                     // 女性のイラスト
                     if let uiImage = UIImage(named: "woman_illustration") ?? 
@@ -98,15 +99,18 @@ struct ResultView: View {
                        UIImage(contentsOfFile: "/Users/kukkiiboy/Desktop/Claude code/FK2QuizApp/Resources/Assets/woman_illustration.png") {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 200, height: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, maxHeight: 240)
+                            .padding(.horizontal, 8)
+                            .clipShape(RoundedRectangle(cornerRadius: 15)) // イラストをカード幅いっぱいに近いサイズへ拡大
                     } else {
                         // フォールバック用のSF Symbol
                         Image(systemName: "figure.seated.side")
-                            .font(.system(size: 120))
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(illustrationColor)
-                            .frame(width: 200, height: 200)
+                            .frame(maxWidth: .infinity, maxHeight: 240)
+                            .padding(.horizontal, 8) // フォールバックも同じサイズ感で表示
                     }
                 }
                 .padding()

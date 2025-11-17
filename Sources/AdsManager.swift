@@ -24,7 +24,7 @@ class AdsManager: NSObject, ObservableObject {
         #if DEBUG
         return "ca-app-pub-3940256099942544/4411468910" // テスト用
         #else
-        return "ca-app-pub-8365176591962448/3970919969" // 本番用
+        return "ca-app-pub-8365176591962448/5587845545" // 本番用
         #endif
     }
     
