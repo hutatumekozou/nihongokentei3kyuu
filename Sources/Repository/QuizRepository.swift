@@ -22,6 +22,11 @@ class QuizRepository: ObservableObject {
             
             let sorted = source.sorted { $0.id < $1.id }
             guard !sorted.isEmpty else { return [] }
+            
+            if topic.isSuddenDeath {
+                return sorted
+            }
+            
             let lowerBound = min(topic.questionRange.lowerBound, sorted.count)
             let upperBound = min(topic.questionRange.upperBound, sorted.count)
             if lowerBound >= upperBound {

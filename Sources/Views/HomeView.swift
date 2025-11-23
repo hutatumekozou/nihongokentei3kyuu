@@ -7,17 +7,32 @@ struct HomeView: View {
                 backgroundView
                     .ignoresSafeArea()
                 
-                VStack(spacing: 24) {
-                    headerView
-                    
-                    LazyVGrid(columns: gridColumns, spacing: 12) {
-                        ForEach(QuizTopic.allCases) { topic in
-                            sectionButton(for: topic)
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(spacing: 16) {
+                        headerView
+                        
+                        LazyVGrid(columns: gridColumns, spacing: 10) {
+                            ForEach(regularTopics) { topic in
+                                sectionButton(for: topic)
+                            }
+                        }
+                        
+                        VStack(spacing: 12) {
+                            Text("3回間違えたら終了モード")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            LazyVGrid(columns: gridColumns, spacing: 10) {
+                                ForEach(suddenDeathTopics) { topic in
+                                    sectionButton(for: topic)
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
+                    .padding(.bottom, 32)
                 }
-                .padding(.bottom, 32)
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -27,7 +42,7 @@ struct HomeView: View {
     }
     
     private var gridColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: 90), spacing: 12)]
+        [GridItem(.adaptive(minimum: 70), spacing: 8)]
     }
     
     private var headerView: some View {
@@ -47,13 +62,13 @@ struct HomeView: View {
     private func sectionButton(for topic: QuizTopic) -> some View {
         NavigationLink(destination: QuizView(topic: topic)) {
             Text(topic.title)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(Color(red: 0.2, green: 0.4, blue: 0.8))
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, minHeight: 34)
+                .padding(.vertical, 4)
                 .background(Color.white)
-                .cornerRadius(12)
-                .shadow(color: .gray.opacity(0.2), radius: 2, x: 0, y: 1)
+                .cornerRadius(10)
+                .shadow(color: .gray.opacity(0.15), radius: 1, x: 0, y: 1)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -62,5 +77,13 @@ struct HomeView: View {
         Image("LaunchBackground")
             .resizable()
             .scaledToFill()
+    }
+    
+    private var regularTopics: [QuizTopic] {
+        QuizTopic.allCases.filter { !$0.isSuddenDeath }
+    }
+    
+    private var suddenDeathTopics: [QuizTopic] {
+        QuizTopic.allCases.filter { $0.isSuddenDeath }
     }
 }

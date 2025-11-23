@@ -4,6 +4,8 @@ struct ResultView: View {
     let topic: QuizTopic
     let correctAnswers: Int
     let totalQuestions: Int
+    let wrongAnswers: Int
+    let isSuddenDeath: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
     
@@ -39,6 +41,11 @@ struct ResultView: View {
         default: // 0-20%
             return Color.pink
         }
+    }
+    
+    private var suddenDeathMessage: String? {
+        guard isSuddenDeath, wrongAnswers >= 3 else { return nil }
+        return "3回間違えたため終了しました。"
     }
     
     var body: some View {
@@ -78,6 +85,13 @@ struct ResultView: View {
                         .font(.title)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
+                    
+                    if let suddenDeathMessage {
+                        Text(suddenDeathMessage)
+                            .font(.subheadline)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .padding()
                 .background(Color.white.opacity(0.9))

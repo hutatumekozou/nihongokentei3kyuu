@@ -1,18 +1,34 @@
 import Foundation
 
 struct QuizTopic: Identifiable, Hashable {
+    enum Mode {
+        case regular
+        case suddenDeath
+    }
+    
     let id: String
     let title: String
     let category: String
     let questionRange: Range<Int>
     let fileName: String
+    let mode: Mode
     
-    init(id: String, title: String, category: String, questionRange: Range<Int>, fileName: String = "questions_ja3") {
+    var isSuddenDeath: Bool { mode == .suddenDeath }
+    
+    init(
+        id: String,
+        title: String,
+        category: String,
+        questionRange: Range<Int>,
+        fileName: String = "questions_ja3",
+        mode: Mode = .regular
+    ) {
         self.id = id
         self.title = title
         self.category = category
         self.questionRange = questionRange
         self.fileName = fileName
+        self.mode = mode
     }
 }
 
@@ -23,18 +39,31 @@ extension QuizTopic: CaseIterable {
             return defaultTopics
         }
         
-        var topicSections: [QuizTopic] = []
         let preferredOrder = ["敬語", "文法", "語彙", "意味", "表記", "漢字", "総合"]
-        var grouped = Dictionary(grouping: questions) { $0.category }
+        let grouped = Dictionary(grouping: questions) { $0.category }
+        
+        var orderedEntries: [(String, [Question])] = []
         
         for category in preferredOrder {
-            if let list = grouped.removeValue(forKey: category) {
-                topicSections.append(contentsOf: topics(for: category, questions: list))
+            if let list = grouped[category] {
+                orderedEntries.append((category, list))
             }
         }
         
-        for (category, list) in grouped.sorted(by: { $0.key < $1.key }) {
+        let remainingEntries = grouped
+            .filter { !preferredOrder.contains($0.key) }
+            .sorted { $0.key < $1.key }
+        orderedEntries.append(contentsOf: remainingEntries)
+        
+        var topicSections: [QuizTopic] = []
+        orderedEntries.forEach { category, list in
             topicSections.append(contentsOf: topics(for: category, questions: list))
+        }
+        
+        orderedEntries.forEach { category, list in
+            if let sudden = suddenDeathTopic(for: category, questions: list) {
+                topicSections.append(sudden)
+            }
         }
         
         return topicSections
@@ -63,12 +92,24 @@ extension QuizTopic: CaseIterable {
                 id: "\(category)-\(chunk + 1)",
                 title: title,
                 category: category,
-                questionRange: start..<end
+                questionRange: start..<end,
+                mode: .regular
             )
             topics.append(topic)
         }
         
         return topics
+    }
+    
+    private static func suddenDeathTopic(for category: String, questions: [Question]) -> QuizTopic? {
+        guard !questions.isEmpty else { return nil }
+        return QuizTopic(
+            id: "\(category)-sudden",
+            title: "\(category)（3ミス終了）",
+            category: category,
+            questionRange: 0..<questions.count,
+            mode: .suddenDeath
+        )
     }
     
     private static var defaultTopics: [QuizTopic] {
@@ -78,7 +119,8 @@ extension QuizTopic: CaseIterable {
                 id: "\($0)-1",
                 title: $0,
                 category: $0,
-                questionRange: 0..<10
+                questionRange: 0..<10,
+                mode: .regular
             )
         }
     }

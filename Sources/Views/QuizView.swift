@@ -7,7 +7,27 @@ struct QuizView: View {
     @State private var selectedAnswer: Int? = nil
     @State private var showExplanation = false
     @State private var correctAnswers = 0
+    @State private var wrongAnswers = 0
     @State private var navigateToResult = false
+    
+    private var isSuddenDeathMode: Bool { topic.isSuddenDeath }
+    
+    private var nextButtonTitle: String {
+        if showExplanation && (pendingSuddenDeath || isLastQuestion) {
+            return "結果を見る"
+        }
+        return "次の問題"
+    }
+    
+    private var pendingSuddenDeath: Bool {
+        guard isSuddenDeathMode, let selected = selectedAnswer else { return false }
+        let isCorrect = selected == questions[currentQuestionIndex].answerIndex
+        return !isCorrect && (wrongAnswers + 1) >= 3
+    }
+    
+    private var isLastQuestion: Bool {
+        currentQuestionIndex == questions.count - 1
+    }
     
     var body: some View {
         ZStack {
@@ -108,7 +128,7 @@ struct QuizView: View {
                         }
                         
                         Button(action: nextQuestion) {
-                            Text(currentQuestionIndex == questions.count - 1 ? "結果を見る" : "次の問題")
+                            Text(nextButtonTitle)
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, minHeight: 50)
@@ -130,7 +150,13 @@ struct QuizView: View {
         }
         .background(
             NavigationLink(
-                destination: ResultView(topic: topic, correctAnswers: correctAnswers, totalQuestions: questions.count),
+                destination: ResultView(
+                    topic: topic,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: questions.count,
+                    wrongAnswers: wrongAnswers,
+                    isSuddenDeath: isSuddenDeathMode
+                ),
                 isActive: $navigateToResult,
                 label: { EmptyView() }
             )
@@ -142,8 +168,16 @@ struct QuizView: View {
     }
     
     private func nextQuestion() {
-        if let selected = selectedAnswer, selected == questions[currentQuestionIndex].answerIndex {
+        guard let selected = selectedAnswer else { return }
+        
+        if selected == questions[currentQuestionIndex].answerIndex {
             correctAnswers += 1
+        } else {
+            wrongAnswers += 1
+            if isSuddenDeathMode && wrongAnswers >= 3 {
+                navigateToResult = true
+                return
+            }
         }
         
         if currentQuestionIndex < questions.count - 1 {
