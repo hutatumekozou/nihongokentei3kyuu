@@ -20,8 +20,14 @@ class QuizRepository: ObservableObject {
                 print("Warning: No category match for \(topic.category). Falling back to full question set.")
             }
             
-            let shuffled = source.shuffled()
-            return Array(shuffled.prefix(min(10, shuffled.count)))
+            let sorted = source.sorted { $0.id < $1.id }
+            guard !sorted.isEmpty else { return [] }
+            let lowerBound = min(topic.questionRange.lowerBound, sorted.count)
+            let upperBound = min(topic.questionRange.upperBound, sorted.count)
+            if lowerBound >= upperBound {
+                return Array(sorted.prefix(min(10, sorted.count)))
+            }
+            return Array(sorted[lowerBound..<upperBound])
         } catch {
             print("Decoding error for \(topic.fileName): \(error)")
             return []
